@@ -140,4 +140,41 @@ window.onload = () => {
         parseInt(document.getElementById("save-user-id").value)
       );
     });
+  let printFoundEvents = (arr) => {
+    document.getElementById("ticketmaster-results").innerHTML =
+      "<li>" + arr.join("</li><li>") + "</li>";
+  };
+
+  let getEventsFromTicketmaster = (searchTerm) => {
+    const url = new URL("https://app.ticketmaster.com/discovery/v2/events");
+    url.search = new URLSearchParams({
+      apikey: env.TMapikey,
+      keyword: searchTerm,
+      locale: "*",
+    });
+    fetch(url)
+      .then((response) => response.json())
+      .then((json) => json._embedded.events)
+      .then((events) => {
+        console.log(events);
+        let names = [];
+        events.forEach((event) => {
+          names.push(event.name);
+        });
+        return names;
+      })
+      .then((namesArray) => {
+        printFoundEvents(namesArray);
+      });
+  };
+
+  let submitEventSearch = () => {
+    let searchString = document.getElementById("ticketmaster-search-field")
+      .value;
+    getEventsFromTicketmaster(searchString);
+  };
+
+  document
+    .getElementById("submit-search-ticketmaster")
+    .addEventListener("click", submitEventSearch);
 };
